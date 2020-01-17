@@ -1,0 +1,312 @@
+知识点做题笔记：栈
+
+155.最小栈
+
+设计一个支持 push，pop，top 操作，并能在常数时间内检索到最小元素的栈。
+
+push(x) -- 将元素 x 推入栈中。
+pop() -- 删除栈顶的元素。
+top() -- 获取栈顶元素。
+getMin() -- 检索栈中的最小元素。
+示例:
+
+MinStack minStack = new MinStack();
+minStack.push(-2);
+minStack.push(0);
+minStack.push(-3);
+minStack.getMin();   --> 返回 -3.
+minStack.pop();
+minStack.top();      --> 返回 0.
+minStack.getMin();   --> 返回 -2.
+
+
+
+解法：设置辅助栈（helper）和数据栈（stack）
+class MinStack(object):
+
+    def __init__(self):
+        """
+        initialize your data structure here.
+        """
+        self.stack=[]
+        self.helper=[]#记录每次压入栈的最小值
+        
+
+    def push(self, x):
+        """
+        :type x: int
+        :rtype: None
+        """
+        self.stack.append(x)
+        if len(self.helper)==0:
+            self.helper.append(x)
+        else:
+            if x<=self.helper[-1]:
+                self.helper.append(x)
+        
+
+    def pop(self):
+        """
+        :rtype: None
+        """
+        num = self.stack.pop()
+        if len(self.helper)>0 and num == self.helper[-1]:#如果pop的不是最小值，就不用弹出
+            self.helper.pop()
+        
+
+    def top(self):
+        """
+        :rtype: int
+        """
+        if len(self.stack)==0:return 0
+        return self.stack[-1]
+        
+
+    def getMin(self):
+        """
+        :rtype: int
+        """
+        if len(self.helper)==0:return 0
+        return self.helper[-1]
+        
+
+
+# Your MinStack object will be instantiated and called as such:
+# obj = MinStack()
+# obj.push(x)
+# obj.pop()
+# param_3 = obj.top()
+# param_4 = obj.getMin()
+
+
+94.二叉树的中序遍历给定一个二叉树，返回它的中序 遍历。
+
+示例:
+
+输入: [1,null,2,3]
+   1
+    \
+     2
+    /
+   3
+
+输出: [1,3,2]
+进阶: 递归算法很简单，你可以通过迭代算法完成吗？
+
+
+中序遍历：左子树---> 根结点 ---> 右子树
+
+
+解法一：递归算法
+# Definition for a binary tree node.
+class TreeNode(object):
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+class Solution(object):
+    def inorderTraversal(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        stack=[]
+        if root:
+            stack=stack+self.inorderTraversal(root.left)
+            stack.append(root.val)
+            stack=stack+self.inorderTraversal(root.right)
+        return stack
+
+
+解法二：颜色标记法（LeetCode）
+
+用颜色来表示结点的访问状态，如果该节点没被访问过，就把该节点的左子树、右子树标记为白色，根标记为灰色表示已经访问过，然后将根压入栈
+# Definition for a binary tree node.
+class TreeNode(object):
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+class Solution(object):
+    def inorderTraversal(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        WHITE,GRAY=0,1
+        stack=[(WHITE,root)]
+        res=[]
+        while stack:
+            color,node=stack.pop()
+            if node is None:continue
+            if color==WHITE:
+                stack.append((WHITE,node.right))
+                stack.append((GRAY,node))
+                stack.append((WHITE,node.left))
+            else:
+                res.append(node.val)
+        return res
+
+拓展：①前序遍历算法：根结点 ---> 左子树 ---> 右子树（144.二叉树的前序遍历）
+
+
+解法一：递归
+# Definition for a binary tree node.
+class TreeNode(object):
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+class Solution(object):
+    def preorderTraversal(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        res=[]
+        if root is not None:
+            res.append(root.val)
+            res=res+self.preorderTraversal(root.left)
+            res=res+self.preorderTraversal(root.right)
+        return res
+②后序遍历算法：左子树 ---> 右子树 ---> 根结点（145.二叉树的后序遍历）
+
+解法一：递归
+# Definition for a binary tree node.
+class TreeNode(object):
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+class Solution(object):
+    def postorderTraversal(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        res=[]
+        if root:
+            res=res+self.postorderTraversal(root.left)
+            res=res+self.postorderTraversal(root.right)
+            res.append(root.val)
+        return res
+
+解法二：
+# Definition for a binary tree node.
+class TreeNode(object):
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+class Solution(object):
+    def postorderTraversal(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        white,grey=0,1
+        stack=[(white,root)]
+        res=[]
+        while stack:
+            color,node=stack.pop()
+            if node is None:continue
+            if color==white:
+                stack.append((grey,node))
+                stack.append((white,node.right))
+                stack.append((white,node.left))
+            else:
+                res.append(node.val)
+        return res
+
+
+394、字符串解码
+给定一个经过编码的字符串，返回它解码后的字符串。
+
+编码规则为: k[encoded_string]，表示其中方括号内部的 encoded_string 正好重复 k 次。注意 k 保证为正整数。
+
+你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。
+
+此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 k ，例如不会出现像 3a 或 2[4] 的输入。
+
+示例:
+
+s = "3[a]2[bc]", 返回 "aaabcbc".
+s = "3[a2[c]]", 返回 "accaccacc".
+s = "2[abc]3[cd]ef", 返回 "abcabccdcdcdef".
+
+
+解法一：利用栈的特性解
+class Solution(object):
+    def decodeString(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        nums=0
+        stack=[]
+        res=''
+        for i in s:
+            if '0'<=i<='9':
+                nums=nums*10+int(i)#记录方括号内的字母需要重复多少次
+            elif i=='[':
+                stack.append([nums,res])#res是之前处理完的字符串，nums是当前方括号内需要重复的次数
+                nums=0
+                res=''
+            elif i==']':
+                cur_nums,last_res=stack.pop()
+                res=last_res + cur_nums*res
+            else:
+                res=res+i#记录当前方括号内的字母
+        return res
+
+解法二：递归
+
+
+739.每日温度
+
+根据每日 气温 列表，请重新生成一个列表，对应位置的输入是你需要再等待多久温度才会升高超过该日的天数。如果之后都不会升高，请在该位置用 0 来代替。
+
+例如，给定一个列表 temperatures = [73, 74, 75, 71, 69, 72, 76, 73]，你的输出应该是 [1, 1, 4, 2, 1, 1, 0, 0]。
+
+提示：气温 列表长度的范围是 [1, 30000]。每个气温的值的均为华氏度，都是在 [30, 100] 范围内的整数。
+
+
+解法一：暴力解法
+class Solution(object):
+    def dailyTemperatures(self, T):
+        """
+        :type T: List[int]
+        :rtype: List[int]
+        """
+        stack=[]
+        len_T=len(T)
+        for i in range(len_T):
+            for j in range(i+1,len_T):
+                if T[j]>T[i]:
+                    a=j-i
+                    stack.append(a)
+                    break
+                if j==len_T-1:stack.append(0)
+        stack.append(0)
+        return stack
+
+解法二：
+class Solution(object):
+    def dailyTemperatures(self, T):
+        """
+        :type T: List[int]
+        :rtype: List[int]
+        """
+        stack=[]
+        len_T=len(T)
+        res=[]
+        for idx,t in enumerate(T):
+            while stack and t>T[stack[-1]]:
+                res[stack.pop()]=idx-stack[-1]
+            stack.append(idx)
+        return res

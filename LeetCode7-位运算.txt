@@ -1,0 +1,251 @@
+知识点二：位运算
+
+169.多位元素
+
+给定一个大小为 n 的数组，找到其中的多数元素。多数元素是指在数组中出现次数大于 ⌊ n/2 ⌋ 的元素。
+
+你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+
+示例 1:
+
+输入: [3,2,3]
+输出: 3
+示例 2:
+
+输入: [2,2,1,1,1,2,2]
+输出: 2
+
+解法一：暴力法（哈希表）
+
+统计每一个词的词频，再查找符合要求的词
+
+class Solution(object):
+    def majorityElement(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        lens=len(nums)
+        fre={}
+        res=[]
+        for idx,val in enumerate(nums):
+            if val in fre:
+                fre[val]=fre[val]+1
+            else:
+                fre[val]=1
+        for key in fre:
+            if fre[key]>int(lens/2):
+                return key
+        return -1
+
+
+counter collection用法：
+
+
+class Solution:
+    def majorityElement(self, nums):
+        counts = collections.Counter(nums)
+        return max(counts.keys(), key=counts.get)
+
+1、collections模块介绍：
+collections是Python内建的一个集合模块，提供了许多有用的集合类。该模块实现了专门的容器数据类型，提供了Python的通用内置容器，dict，list，set和tuple的替代方法。
+
+2、Counter类：
+Counter类的目的是用来跟踪值出现的次数。它是一个无序的容器类型，以字典的键值对形式存储，其中元素作为key，其计数作为value。计数值可以是任意的Interger（包括0和负数）。Counter类和其他语言的bags或multisets很相似。
+Counter类创建方式有以下几种：
+元素从可迭代计数或从另一个映射（或计数器）初始化：
+
+>>> c = Counter()                           # 创建一个Counter类
+>>> c = Counter('gallahad')                 # 创建一个可迭代对象
+>>> c = Counter({'red': 4, 'blue': 2})      # 创建一个字典对象
+>>> c = Counter(cats=4, dogs=8)             # 从键值对创建
+1
+2
+3
+4
+对于counter类里边没有的元素，将返回 0
+
+>>> c = Counter(['eggs', 'ham'])     
+>>> c['bacon']  
+0
+1
+2
+3
+>>> c['eggs'] 
+1
+
+
+解法三：排序法
+
+可以将所有数字以单调递增或者单调递减的方式排序，那么可以通过查找对应下标来找到众数
+
+class Solution(object):
+    def majorityElement(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        nums.sort()
+        return nums[len(nums)//2]
+
+解法四：随机挑选法
+
+一个众数在数组中出现的概率很大，随机挑选一个数字，如果是众数，就返回，不是就继续挑选
+
+解法五：分治算法
+
+如果知道左边一半数组和右边一半数组的众数，那么就可以求出全局的众数（不断的递归直到只剩一个数为止）
+
+解法六：投票算法
+
+
+461.汉明距离
+
+两个整数之间的汉明距离指的是这两个数字对应二进制位不同的位置的数目。
+
+给出两个整数 x 和 y，计算它们之间的汉明距离。
+
+注意：
+0 ≤ x, y < 231.
+
+示例:
+
+输入: x = 1, y = 4
+
+输出: 2
+
+解释:
+1   (0 0 0 1)
+4   (0 1 0 0)
+       ↑   ↑
+
+上面的箭头指出了对应二进制位不同的位置。
+
+解法：将x和y按位异或得到i，再求i的二进制位中1的个数
+
+
+class Solution(object):
+    def hammingDistance(self, x, y):
+        """
+        :type x: int
+        :type y: int
+        :rtype: int
+        """
+        return bin(x^y).count("1")
+
+或者：
+class Solution(object):
+    def hammingDistance(self, x, y):
+        """
+        :type x: int
+        :type y: int
+        :rtype: int
+        """
+        i=x^y
+        count=0
+        while i:
+            if i & 1:
+                count=count+1
+            i=i>>1
+        return count
+
+
+78.子集
+
+给定一组不含重复元素的整数数组 nums，返回该数组所有可能的子集（幂集）。
+
+说明：解集不能包含重复的子集。
+
+示例:
+
+输入: nums = [1,2,3]
+输出:
+[
+  [3],
+  [1],
+  [2],
+  [1,2,3],
+  [1,3],
+  [2,3],
+  [1,2],
+  []
+]
+
+
+
+解法一：库函数法
+
+itertools模块的combination(iterable,r)函数：生成iterable里以r为长度的所有子序列
+
+class Solution(object):
+    def subsets(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[List[int]]
+        """
+        ans=[]
+        lens=len(nums)
+        for i in range(lens+1):
+            for tmp in itertools.combinations(nums,i):
+                ans.append(tmp)
+        return ans
+
+
+解法二：迭代
+
+class Solution(object):
+    def subsets(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[List[int]]
+        """
+        ans=[[]]
+        for i in nums:
+            ans=ans+[[i]+num for num in ans]
+        return ans
+
+
+338.比特位计数
+
+给定一个非负整数 num。对于 0 ≤ i ≤ num 范围中的每个数字 i ，计算其二进制数中的 1 的数目并将它们作为数组返回。
+
+示例 1:
+
+输入: 2
+输出: [0,1,1]
+示例 2:
+
+输入: 5
+输出: [0,1,1,2,1,2]
+
+
+解法一：利用函数
+class Solution(object):
+    def countBits(self, num):
+        """
+        :type num: int
+        :rtype: List[int]
+        """
+        ans=[]
+        for i in range(num+1):
+            ans.append(bin(i).count("1"))
+        return ans
+
+解法二：动态规划+二进制位特性
+
+奇数的二进制1的个数等于前一个偶数的二进制1的个数加一
+偶数位二进制中1的个数等于该偶数除以2的二进制1的个数
+
+class Solution(object):
+    def countBits(self, num):
+        """
+        :type num: int
+        :rtype: List[int]
+        """
+        ans=[0]*(num+1)
+        for i in range(num+1):
+            if i%2 == 1:
+                ans[i]=ans[i-1]+1
+            else:
+                ans[i]=ans[i//2]
+        return ans
